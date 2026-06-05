@@ -5,6 +5,7 @@ RAW_DATA_PATH = Path("data/raw/amazon.csv")
 PROCESSED_DATA_PATH = Path("data/processed/amazon_cleaned.csv")
 
 
+
 def clean_numeric(value):
     """
     Cleans messy numeric strings like:
@@ -36,7 +37,38 @@ def clean_numeric(value):
 
 def main():
     df = pd.read_csv(RAW_DATA_PATH)
+    
+    initial_rows = df.shape[0]
 
+    duplicate_review_rows = df.duplicated(
+        subset=["product_id", "review_title", "review_content"]
+    ).sum()
+
+    print(f"Initial rows: {initial_rows}")
+    print(f"Duplicate review rows found: {duplicate_review_rows}")
+
+    df = df.drop_duplicates(
+        subset=["product_id", "review_title", "review_content"],
+        keep="first"
+    )
+
+    rows_after_deduplication = df.shape[0]
+    rows_removed = initial_rows - rows_after_deduplication
+    
+    initial_rows = df.shape[0]
+    exact_duplicate_rows = df.duplicated().sum()
+
+    print(f"Initial rows: {initial_rows}")
+    print(f"Exact duplicate rows found: {exact_duplicate_rows}")
+
+    df = df.drop_duplicates()
+
+    rows_after_deduplication = df.shape[0]
+    rows_removed = initial_rows - rows_after_deduplication
+
+    print(f"Rows removed: {rows_removed}")
+    print(f"Rows after deduplication: {rows_after_deduplication}")
+    
     numeric_columns = [
         "discounted_price",
         "actual_price",
